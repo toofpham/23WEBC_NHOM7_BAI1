@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Upload Demo";
+}
+<h2>Upload Demo</h2>
+
+<p><strong>Giới hạn từ config:</strong> @ViewBag.MaxMb MB</p>
+<p><strong>Blocked IPs:</strong> @ViewBag.Blocked</p>
+
+<form asp-action="Upload" asp-controller="Files" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <button type="submit">Upload</button>
+</form>
