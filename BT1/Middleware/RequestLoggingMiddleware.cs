@@ -1,4 +1,4 @@
-﻿namespace BT1
+﻿namespace BT1.Middleware
 {
     public class RequestLoggingMiddleware
     {
