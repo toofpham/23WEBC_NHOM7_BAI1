@@ -1,0 +1,173 @@
+﻿@model PaginatedList<BT1.Models.User>
+
+@{
+    ViewData["Title"] = "Danh sách người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-users"></i> Danh sách người dùng
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Thông tin tổng quan -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-0">
+                                Hiển thị <strong>@Model.Items.Count</strong> trong tổng số <strong>@Model.TotalItems</strong> người dùng
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <p class="text-muted mb-0">
+                                Trang <strong>@Model.CurrentPage</strong> / <strong>@Model.TotalPages</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bảng danh sách người dùng -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Tên đăng nhập</th>
+                                    <th scope="col">Mật khẩu</th>
+                                    <th scope="col">Vai trò</th>
+                                    <th scope="col">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Items.Any())
+                                {
+                                    @foreach (var user in Model.Items)
+                                    {
+                                                        <tr>
+                                                            <th scope="row">@user.Id</th>
+                                                            <td>
+                                                                <strong>@user.Username</strong>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-muted">••••••••</span>
+                                                                <small class="d-block text-muted">(@user.Password.Length ký tự)</small>
+                                                            </td>
+                                                            <td>
+                                                @switch (user.Role)
+                                                {
+                                                    case 1:
+                                                                                        <span class="badge bg-danger">@user.Role</span>
+                                                        break;
+                                                    case 2:
+                                                                                        <span class="badge bg-warning text-dark">@user.Role</span>
+                                                        break;
+                                                    case 3:
+                                                                                        <span class="badge bg-success">@user.Role</span>
+                                                        break;
+                                                    default:
+                                                                                        <span class="badge bg-secondary">@user.Role</span>
+                                                        break;
+                                                }
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge bg-success">
+                                                                    <i class="fas fa-check"></i> Hoạt động
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-4">
+                                                    <i class="fas fa-user-slash fa-2x mb-2"></i>
+                                                    <br />
+                                                    Không có người dùng nào
+                                                </td>
+                                            </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Phân trang -->
+                    @if (Model.TotalPages > 1)
+                    {
+                                <nav aria-label="Phân trang người dùng">
+                                    <ul class="pagination justify-content-center">
+                                        <!-- Nút Previous -->
+                                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                                            <a class="page-link"
+                                               href="@(!Model.HasPreviousPage ? "#" : Url.Action("Index", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize }))"
+                                               tabindex="@(!Model.HasPreviousPage ? "-1" : "")">
+                                                <i class="fas fa-chevron-left"></i> Trước
+                                            </a>
+                                        </li>
+
+                                        <!-- Các số trang -->
+                                @{
+                                    int startPage = Math.Max(1, Model.CurrentPage - 2);
+                                    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+                                }
+
+                                @if (startPage > 1)
+                                {
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="@Url.Action("Index", new { page = 1, pageSize = Model.PageSize })">1</a>
+                                                    </li>
+                                    @if (startPage > 2)
+                                    {
+                                                                <li class="page-item disabled">
+                                                                    <span class="page-link">...</span>
+                                                                </li>
+                                    }
+                                }
+
+                                @for (int i = startPage; i <= endPage; i++)
+                                {
+                                                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize })">
+                                            @i
+                                            @if (i == Model.CurrentPage)
+                                            {
+                                                                        <span class="sr-only">(trang hiện tại)</span>
+                                            }
+                                                        </a>
+                                                    </li>
+                                }
+
+                                @if (endPage < Model.TotalPages)
+                                {
+                                    @if (endPage < Model.TotalPages - 1)
+                                    {
+                                                                <li class="page-item disabled">
+                                                                    <span class="page-link">...</span>
+                                                                </li>
+                                    }
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="@Url.Action("Index", new { page = Model.TotalPages, pageSize = Model.PageSize })">
+                                            @Model.TotalPages
+                                                        </a>
+                                                    </li>
+                                }
+
+                                        <!-- Nút Next -->
+                                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                                            <a class="page-link"
+                                               href="@(!Model.HasNextPage ? "#" : Url.Action("Index", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize }))"
+                                               tabindex="@(!Model.HasNextPage ? "-1" : "")">
+                                                Sau <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

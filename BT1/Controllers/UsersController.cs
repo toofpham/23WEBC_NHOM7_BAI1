@@ -15,12 +15,23 @@ namespace BT1.Controllers
             _userService = userService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
+            // Validate page number
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 5;
+            if (pageSize > 50) pageSize = 50;
             // Lấy danh sách user từ service (Tran Tuan Kiet_4:37 21/09/2025)
-            var allUsers = _userService.GetUsers(); 
+            var allUsers = _userService.GetUsers();
 
-            return View();
+            // Tạo phân trang
+            var paginatedUsers = PaginatedList<User>.Create(allUsers, page, pageSize);
+
+            // Truyền thông tin phân trang qua ViewBag để sử dụng trong View
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+
+            return View(paginatedUsers);
         }
     }
 }
